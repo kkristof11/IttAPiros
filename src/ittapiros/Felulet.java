@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -19,7 +22,7 @@ public class Felulet extends javax.swing.JFrame {
     private boolean megtalalta;
     private boolean ujraKeveres;
     String fajlNev="config.bin";
-    public Felulet() {
+    public Felulet() throws IOException {
         inicializal();
     }
 
@@ -180,7 +183,11 @@ public class Felulet extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        inicializal();
+        try {
+            inicializal();
+        } catch (IOException ex) {
+            Logger.getLogger(Felulet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
@@ -276,7 +283,11 @@ public class Felulet extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Felulet().setVisible(true);
+                try {
+                    new Felulet().setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(Felulet.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -318,15 +329,16 @@ public class Felulet extends javax.swing.JFrame {
         }
     }
 
-    private void inicializal() {
+    private void inicializal() throws IOException {
         initComponents();
         melyikPohar=poharatValasztGep();
         megtalalta=false;
         ujraKeveres=false;
         jLabel1.setText("Válassz poharat!");
+        vanTipp();
     }
 
-    private void betoltesBeallitas() {
+    private void betoltesBeallitas() throws IOException {
         //initComponents();
         if(megtalalta){
             jLabel1.setText("Eltaláltad!");
@@ -338,6 +350,16 @@ public class Felulet extends javax.swing.JFrame {
         }else{
             jCheckBox1.setSelected(false);
         }
+        vanTipp();
         System.out.println(melyikPohar+1+" Helyen van a golyó");
+    }
+
+    private void vanTipp() throws IOException {
+        final Path tippFajlPath = Paths.get("tipp.deb");
+        //final Path tippFajlPath = Files.createTempFile("tipp", ".deb"); //tesztelésre csinál egy ideiglenes tipp.deb fájlt.
+        if(Files.exists(tippFajlPath)){
+            this.setTitle(melyikPohar+1+" helyen van a golyó");
+        }else
+            this.setTitle("Nincs tipp");
     }
 }
