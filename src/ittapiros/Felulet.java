@@ -1,22 +1,24 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ittapiros;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author Martin
- */
 public class Felulet extends javax.swing.JFrame {
 
     /**
      * Creates new form felulet
      */
     private int melyikPohar;
+    private boolean megtalalta;
+    private boolean ujraKeveres;
+    String fajlNev="config.bin";
     public Felulet() {
         inicializal();
     }
@@ -123,9 +125,19 @@ public class Felulet extends javax.swing.JFrame {
         jMenu2.add(jMenuItem1);
 
         jMenuItem2.setText("Mentés");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMenuItem2);
 
         jMenuItem3.setText("Betöltés");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMenuItem3);
 
         jMenuBar1.add(jMenu2);
@@ -191,9 +203,47 @@ public class Felulet extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-        melyikPohar=poharatValasztGep();
-        jLabel1.setText("Válassz poharat!");
+        if(jCheckBox1.isSelected()){
+            melyikPohar=poharatValasztGep();
+            ujraKeveres=true;
+            jLabel1.setText("Válassz poharat!");
+        }
     }//GEN-LAST:event_jCheckBox1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        System.out.println("Mentés");
+        
+        try {
+            FileOutputStream fajlOS = new FileOutputStream(fajlNev);
+            try (ObjectOutputStream os = new ObjectOutputStream(fajlOS)) {
+                os.writeInt(melyikPohar);
+                os.writeBoolean(megtalalta);
+                os.writeBoolean(ujraKeveres);
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Felulet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Felulet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        System.out.println("Betöltés");
+        try {
+            FileInputStream fajlIS= new FileInputStream(fajlNev);
+            ObjectInputStream is = new ObjectInputStream(fajlIS);
+            melyikPohar= is.readInt();
+            megtalalta = is.readBoolean();
+            ujraKeveres = is.readBoolean();
+            is.close();
+            betoltesBeallitas();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Felulet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Felulet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -258,8 +308,10 @@ public class Felulet extends javax.swing.JFrame {
     private void ellenor(int i) {
         if(melyikPohar==i){
             jLabel1.setText("Eltaláltad!");
+            megtalalta=true;
         }else{
             jLabel1.setText("Nem talált!");
+            megtalalta=false;
         }
         if(jCheckBox1.isSelected()){
             melyikPohar= poharatValasztGep();
@@ -269,6 +321,23 @@ public class Felulet extends javax.swing.JFrame {
     private void inicializal() {
         initComponents();
         melyikPohar=poharatValasztGep();
+        megtalalta=false;
+        ujraKeveres=false;
         jLabel1.setText("Válassz poharat!");
+    }
+
+    private void betoltesBeallitas() {
+        //initComponents();
+        if(megtalalta){
+            jLabel1.setText("Eltaláltad!");
+        }else{
+            jLabel1.setText("Nem talált!");
+        }
+        if(ujraKeveres){
+            jCheckBox1.setSelected(true);
+        }else{
+            jCheckBox1.setSelected(false);
+        }
+        System.out.println(melyikPohar+1+" Helyen van a golyó");
     }
 }
